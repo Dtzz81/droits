@@ -56,7 +56,7 @@ export default function (app) {
             headers: true
           })
             .on('error', (errorMsg) => {
-              console.log(errorMsg);
+               console.log(errorMsg);
             })
             .on("data", function (data) {
               // Push each row
