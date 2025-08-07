@@ -30,3 +30,28 @@ describe('Uploaded file', () => {
         }
     });
 });
+
+describe('Uploaded file fails', () => {
+    it('returns a 403 status if filename does not start with uploadDir', async () => {
+        const invalidTestFilePath = path.join(__dirname,'..', 'invalid-upload.csv');
+        
+        // csv test object for upload
+        const csvContent = 'Description,Quantity,Total value,Storage address line 1,Town,County,Postcode\nTest Item,1,£10,Test Address,Test Town,Test County,BB10 2AA';
+
+        // test file
+        fs.writeFileSync(invalidTestFilePath, csvContent);
+
+        try {
+            const res = await request(app)
+                .post('/report/property-bulk')
+                .attach('bulk-upload-file', invalidTestFilePath);
+
+            expect(res.body.status).toBe(403);
+        } finally {
+            // Clean up
+            if (fs.existsSync(invalidTestFilePath)) {
+                fs.unlinkSync(invalidTestFilePath);
+            }
+        }
+    });
+});
