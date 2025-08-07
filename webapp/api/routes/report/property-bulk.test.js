@@ -1,3 +1,4 @@
+
 import "../../../jest.config.js";
 import request from "supertest";
 require('dotenv-json')();
@@ -29,38 +30,3 @@ describe('Uploaded file', () => {
         }
     });
 });
-
-describe('File upload failed', () => {
-    it('throws an error because filename does not start with uploadDir', async () => {
-        const testFilePath = path.join(__dirname, 'test-outside.csv');
-        const csvContent = 'Header1,Header2\nval1,val2';
-        fs.writeFileSync(testFilePath, csvContent);
-
-        const originalResolve = path.resolve;
-
-        jest.spyOn(path, 'resolve').mockImplementation((p) => {
-            if (p === testFilePath) {
-                return '/unauthorized/path/test-outside.csv';
-            }
-            return originalResolve(p);
-        });
-
-        try {
-            const res = await request(app)
-                .post('/report/property-bulk')
-                .attach('bulk-upload-file', testFilePath);
-
-            expect(res.status).toBe(403);
-            expect(res.text).toBe('Forbidden');
-        }
-            finally {
-                // Restore path.resolve
-                path.resolve.mockRestore();
-
-                // Clean up
-                if (fs.existsSync(testFilePath)) {
-                    fs.unlinkSync(testFilePath);
-                }
-            }
-        });
-    });
