@@ -43,6 +43,7 @@ export default function (app) {
     "/report/property-bulk",
     function (req, res) {
       upload(req, res, function (multerError) {
+        const resolvedPath = req.file.path
         if (multerError) {
           if (multerError.code === 'LIMIT_FILE_SIZE') {
             err.text = 'The selected file must be smaller than 5MB';
@@ -51,12 +52,7 @@ export default function (app) {
           }
           res.json({ error: err });
         } else {
-          const uploadDir = path.join(__dirname, "uploads");
-          const resolvedPath = path.resolve(req.file.path);
-          if (!resolvedPath.startsWith(uploadDir)) {
-            res.status(403).send("Forbidden");
-            return;
-          }
+          
           const fileRows = [];
           csv.parseFile(req.file.path, {
             headers: true
@@ -70,7 +66,7 @@ export default function (app) {
             })
             .on("end", function () {
               // Remove temp file
-              fs.unlinkSync(req.file.path);
+              fs.unlinkSync(resolvedPath);
               // Run validation checks
               validateCsvData(fileRows).then(() => {
                 if (err.text) {

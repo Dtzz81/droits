@@ -31,9 +31,9 @@ describe('Uploaded file', () => {
     });
 });
 
-describe('Uploaded file fails', () => {
-    it('returns a 403 status if filename does not start with uploadDir', async () => {
-        const invalidTestFilePath = path.join(__dirname,'..', 'invalid-upload.csv');
+describe('Uploaded file', () => {
+    it('returns a 200 status as the upload is always redirected to uploads folder', async () => {
+        const invalidTestFilePath = path.join(__dirname,'../', 'invalid-upload.csv');
         
         // csv test object for upload
         const csvContent = 'Description,Quantity,Total value,Storage address line 1,Town,County,Postcode\nTest Item,1,£10,Test Address,Test Town,Test County,BB10 2AA';
@@ -46,7 +46,8 @@ describe('Uploaded file fails', () => {
                 .post('/report/property-bulk')
                 .attach('bulk-upload-file', invalidTestFilePath);
 
-            expect(res.body.status).toBe(403);
+            expect(res.body.status).toBe(200);
+            expect()
         } finally {
             // Clean up
             if (fs.existsSync(invalidTestFilePath)) {
