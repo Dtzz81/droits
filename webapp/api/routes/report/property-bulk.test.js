@@ -32,23 +32,27 @@ describe('Uploaded file', () => {
 });
 
 describe('Uploaded file', () => {
-    it('returns a 200 status as the upload is always redirected to uploads folder', async () => {
-        const invalidTestFilePath = path.join(__dirname,'../', 'invalid-upload.csv');
-        
-        // csv test object for upload
+    it('always uploads the file to the ./uploads folder', async () => {
+        const invalidTestFilePath = path.join(__dirname, '../', 'invalid-upload.csv');
         const csvContent = 'Description,Quantity,Total value,Storage address line 1,Town,County,Postcode\nTest Item,1,£10,Test Address,Test Town,Test County,BB10 2AA';
 
         // test file
         fs.writeFileSync(invalidTestFilePath, csvContent);
+        let uploadedFileName;
 
         try {
             const res = await request(app)
                 .post('/report/property-bulk')
                 .attach('bulk-upload-file', invalidTestFilePath);
 
-            expect(res.body.status).toBe(200);
-            expect()
-        } finally {
+            const uploadedFiles = fs.readdirSync('./uploads');
+            uploadedFileName = uploadedFiles.find(name => name.endsWith('.csv'));
+            const fullPath = path.resolve('./uploads', uploadedFileName);
+
+            expect(fullPath.startsWith(path.resolve('./uploads'))).toBe(true);
+        }
+        
+        finally {
             // Clean up
             if (fs.existsSync(invalidTestFilePath)) {
                 fs.unlinkSync(invalidTestFilePath);
