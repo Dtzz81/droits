@@ -1,19 +1,23 @@
-import rateLimit from 'express-rate-limit';
-
 const passport = require('passport');
 
-const maxRequests = process.env.RATE_LIMIT_MAX || 10;
-const loginLimiter = rateLimit({
-    windowMs: 60 * 1000,
-    max: maxRequests,
-    message: { error: "Too many requests, please try again later." }
-});
+// const maxRequests = process.env.RATE_LIMIT_MAX || 10;
+// const loginLimiter = rateLimit({
+//     windowMs: 60 * 1000,
+//     max: maxRequests,
+//     message: { error: "Too many requests, please try again later." }
+// });
 
+const { RateLimiterMemory } = require('rate-limiter-flexible');
+const rateLimiter = new RateLimiterMemory({
+    points: 10,        // max requests
+    duration: 60,      // per 60 seconds
+    blockDuration: 300 // block for 300 seconds if exceeded
+});
 export default function (app) {
   app
     .get(
       '/auth/openid/return',
-        loginLimiter,
+        rateLimiter,
       function (req, res, next) {
         passport.authenticate('azuread-openidconnect', {
           response: res,

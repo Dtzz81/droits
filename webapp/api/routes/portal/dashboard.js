@@ -4,16 +4,22 @@ import CustomParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(CustomParseFormat);
 import ensureAuthenticated from './ensureAuthenticated';
 import {assignSalvorInfoReportStatus} from "../../../utilities/assignReportStatus";
-import rateLimit from "express-rate-limit";
 
 require("dotenv-json")();
 
-const url = `${process.env.API_ENDPOINT}/api/salvor`
-const maxRequests = process.env.RATE_LIMIT_MAX || 10;
-const propertyFormImageDeleteLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: maxRequests,
-  message: { error: "Too many requests, please try again later." }
+// const url = `${process.env.API_ENDPOINT}/api/salvor`
+// const maxRequests = process.env.RATE_LIMIT_MAX || 10;
+// const propertyFormImageDeleteLimiter = rateLimit({
+//   windowMs: 60 * 1000,
+//   max: maxRequests,
+//   message: { error: "Too many requests, please try again later." }
+// });
+
+const { RateLimiterMemory } = require('rate-limiter-flexible');
+const rateLimiter = new RateLimiterMemory({
+  points: 10,        // max requests
+  duration: 60,      // per 60 seconds
+  blockDuration: 300 // block for 300 seconds if exceeded
 });
 export default function (app) {
   app

@@ -2,20 +2,26 @@ import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
 import {allWmContainImages, formatValidationErrors} from '../../../utilities';
-import rateLimit from 'express-rate-limit';
 
 const { body, validationResult } = require('express-validator');
 var cloneDeep = require('lodash.clonedeep');
 
-const maxRequests = process.env.RATE_LIMIT_MAX || 10;
-const propertyFormImageDeleteLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: maxRequests,
-  message: { error: "Too many requests, please try again later." }
+// const maxRequests = process.env.RATE_LIMIT_MAX || 10;
+// const propertyFormImageDeleteLimiter = rateLimit({
+//   windowMs: 60 * 1000,
+//   max: maxRequests,
+//   message: { error: "Too many requests, please try again later." }
+// });
+
+const { RateLimiterMemory } = require('rate-limiter-flexible');
+const rateLimiter = new RateLimiterMemory({
+  points: 10,        // max requests
+  duration: 60,      // per 60 seconds
+  blockDuration: 300 // block for 300 seconds if exceeded
 });
 export default function (app) {
   // If user clicks back button on confirmation page it will redirect to start page
-  app.get('/report/check-your-answers', propertyFormImageDeleteLimiter, function (req, res, next) {
+  app.get('/report/check-your-answers', rateLimiter, function (req, res, next) {
     if (Object.keys(req.session.data['report-date']).length === 0) {
       return res.redirect('/report/start');
     }
