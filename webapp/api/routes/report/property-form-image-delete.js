@@ -8,14 +8,25 @@ import rateLimit from 'express-rate-limit';
 //   message: { error: "Too many requests, please try again later." }
 // });
 
+
 const { RateLimiterMemory } = require('rate-limiter-flexible');
 const rateLimiter = new RateLimiterMemory({
   points: 10,        // max requests
   duration: 60,      // per 60 seconds
   blockDuration: 300 // block for 300 seconds if exceeded
 });
+
+const rateLimiterMiddleware = (req, res, next) => {
+  rateLimiter.consume(req.ip)
+      .then(() => {
+        next(); // Proceed to the next middleware or route handler
+      })
+      .catch((rejRes) => {
+        res.status(429).send('Too Many Requests');
+      });
+};
 export default function (app) {
-  app.post('/report/property-form-image-delete/:prop_id', rateLimiter, function (req, res) {
+  app.post('/report/property-form-image-delete/:prop_id', rateLimiterMiddleware, function (req, res) {
     const id = req.params.prop_id;
     const image = req.session.data.property[id].image;
 

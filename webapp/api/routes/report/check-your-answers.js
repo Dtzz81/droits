@@ -19,9 +19,19 @@ const rateLimiter = new RateLimiterMemory({
   duration: 60,      // per 60 seconds
   blockDuration: 300 // block for 300 seconds if exceeded
 });
+
+const rateLimiterMiddleware = (req, res, next) => {
+  rateLimiter.consume(req.ip)
+      .then(() => {
+        next(); // Proceed to the next middleware or route handler
+      })
+      .catch((rejRes) => {
+        res.status(429).send('Too Many Requests');
+      });
+};
 export default function (app) {
   // If user clicks back button on confirmation page it will redirect to start page
-  app.get('/report/check-your-answers', rateLimiter, function (req, res, next) {
+  app.get('/report/check-your-answers', rateLimiterMiddleware, function (req, res, next) {
     if (Object.keys(req.session.data['report-date']).length === 0) {
       return res.redirect('/report/start');
     }

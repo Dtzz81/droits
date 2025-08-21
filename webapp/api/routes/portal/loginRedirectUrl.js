@@ -13,11 +13,21 @@ const rateLimiter = new RateLimiterMemory({
     duration: 60,      // per 60 seconds
     blockDuration: 300 // block for 300 seconds if exceeded
 });
+
+const rateLimiterMiddleware = (req, res, next) => {
+    rateLimiter.consume(req.ip)
+        .then(() => {
+            next(); // Proceed to the next middleware or route handler
+        })
+        .catch((rejRes) => {
+            res.status(429).send('Too Many Requests');
+        });
+};
 export default function (app) {
   app
     .get(
       '/auth/openid/return',
-        rateLimiter,
+        rateLimiterMiddleware,
       function (req, res, next) {
         passport.authenticate('azuread-openidconnect', {
           response: res,
