@@ -21,10 +21,20 @@ const rateLimiter = new RateLimiterMemory({
   duration: 60,      // per 60 seconds
   blockDuration: 300 // block for 300 seconds if exceeded
 });
+
+const rateLimiterMiddleware = (req, res, next) => {
+  rateLimiter.consume(req.ip)
+      .then(() => {
+        next();
+      })
+      .catch((rejRes) => {
+        res.status(429).send('Too Many Requests');
+      });
+};
 export default function (app) {
   app
       .get('/portal/dashboard',
-          propertyFormImageDeleteLimiter,
+          rateLimiterMiddleware,
           ensureAuthenticated,
           function (req, res) {
       const currentUserEmail = req.user.emails[0] || req.session.user.emails[0];

@@ -19,7 +19,7 @@ const rateLimiter = new RateLimiterMemory({
 const rateLimiterMiddleware = (req, res, next) => {
   rateLimiter.consume(req.ip)
       .then(() => {
-        next(); // Proceed to the next middleware or route handler
+        next(); 
       })
       .catch((rejRes) => {
         res.status(429).send('Too Many Requests');
