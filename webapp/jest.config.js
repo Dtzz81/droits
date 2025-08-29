@@ -4,4 +4,8 @@ module.exports = {
         './test-mocks/jest.setup.passport-mock.js',
         './test-mocks/jest.setup.passport-azure-ad.js'
     ],
+    testPathIgnorePatterns: [
+        '/node_modules/',
+        '/cypress/'
+    ]
 };
