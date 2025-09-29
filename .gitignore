@@ -62,3 +62,4 @@ StrykerOutput
 
 # e2e test
 *tests/node_modules
+*tests/cypress/screenshots
