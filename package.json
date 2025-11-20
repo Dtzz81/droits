@@ -2,11 +2,13 @@
   "private": true,
   "devDependencies": {
     "husky": "^9.1.7",
+    "jest": "^30.2.0",
     "lint-staged": "^15.4.3"
   },
   "scripts": {
     "prepare": "husky",
-    "format:terraform": "terraform fmt -recursive"
+    "format:terraform": "terraform fmt -recursive",
+    "test": "jest"
   },
   "lint-staged": {
     "**/*.tf": "npm run format:terraform --"
