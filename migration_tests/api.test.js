@@ -15,3 +15,20 @@ describe("GitHub login flow", () => {
         );
     });
 });
+
+describe("OIDC login flow", () => {
+    test("user session is returned after login", async () => {
+
+        const user = await authConfig.providers.find(p => p.name === "OIDC").authorize();
+        const session = { user }; // simulate session
+
+        expect(session).toEqual(
+            expect.objectContaining({
+                user: expect.objectContaining({
+                    name: "Test OIDC User",
+                    email: "oidcuser@example.com",
+                }),
+            })
+        );
+    });
+});
