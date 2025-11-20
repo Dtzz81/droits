@@ -32,3 +32,23 @@ describe("OIDC login flow", () => {
         );
     });
 });
+
+const handler = require("./nextauth-wrapper");
+
+describe("Azure AD OIDC login route", () => {
+    test("returns user session when logged in via OIDC", async () => {
+        const req = { method: "GET", headers: {} };
+        const res = { json: jest.fn(), status: jest.fn().mockReturnThis() };
+
+        await handler(req, res); // call the wrapper
+
+        expect(res.json).toHaveBeenCalledWith(
+            expect.objectContaining({
+                user: expect.objectContaining({
+                    name: "Test OIDC User",
+                    email: "oidcuser@example.com",
+                }),
+            })
+        );
+    });
+});
