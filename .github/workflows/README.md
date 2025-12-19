@@ -27,4 +27,3 @@ Builds Docker image
 Push Docker image to ECR (with tag:${github.sha})
 Stage 3: Once both pipelines have run successfully, deploys terraform changes (which releases the commit's built image)
 
-test
